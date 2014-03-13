@@ -3,6 +3,7 @@ import re
 from string import Template
 from subprocess import call, Popen, PIPE
 from time import strftime, sleep, gmtime, mktime
+from datetime import datetime
 
 from locator import module_path
 g_BaseDir = os.path.normpath(os.path.join(module_path(), '..'))
@@ -106,6 +107,27 @@ def extract_args_from_title(args):
                 # do another round
                 keep_going = True
                 break
+
+# Create a new project-notebook in active stack and import new-project notes
+def o3_generation(args):
+    if not args.notebook:
+        raise RuntimeError('Notebook parameter not optional for this command')
+
+    # Prepare template dictionary
+    tmpl_params = {
+        'ProjName': args.notebook,
+        }
+
+    timestr = datetime.strftime(datetime.now(), "%Y-%m-%d")
+    # Import template into Evernote
+    call_enscript(['createNote', '/s', args.template,
+                   '/n', args.notebook,
+                   '/i', timestr,
+                   '/t', 'one-on-ones'])
+
+    # Open the first note in a separate window after importing (if flagged to)
+    if args.open_note:
+        open_first_note('notebook:"%s"' % (args.notebook))
 
 # Create and import an action-note, optionally opening it in a separate window
 def action_note(args):
@@ -267,6 +289,13 @@ if '__main__' == __name__:
                         help='Enables dry-run mode - '
                              'print the commands without executing them')
     subparsers = parser.add_subparsers()
+
+    # Add O3 subcommand
+    parser_o3 = subparsers.add_parser('o3', help="Create a new note-o3")
+    parser_o3.add_argument('-t', '--template',
+                           default=os.path.join(g_TmplDir, 'O3 Template.txt'))
+    parser_o3.set_defaults(func=o3_generation)
+
     # Add note-action subcommand
     parser_action = subparsers.add_parser('action',
                                help='Create a new note-action')
