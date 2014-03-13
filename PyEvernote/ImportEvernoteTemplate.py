@@ -20,7 +20,7 @@ g_DryRun = False
 
 # Invoke the ENScript.exe Evernote program (modify path if needed)
 def call_enscript(args):
-    cmd = ['ENScript.exe']
+    cmd = ['C:\\Program Files (x86)\\Evernote\\Evernote\\ENScript.exe']
     cmd.extend(args)
     if g_DryRun:
         print cmd
@@ -168,7 +168,7 @@ def action_note(args):
     if args.notebook:
         # Get list of notebook by running ENScript listNotebooks
         # it writes the notebooks the stdout, one per line
-        p = Popen(['ENScript.exe', 'listNotebooks'], stdout=PIPE)
+        p = Popen(['C:\\Program Files (x86)\\Evernote\\Evernote\\ENScript.exe', 'listNotebooks'], stdout=PIPE)
         notebooks, _ = p.communicate()
         notebooks = [nb.strip() for nb in notebooks.split('\n')]
         def get_notebook(query):
